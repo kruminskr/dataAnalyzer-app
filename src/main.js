@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 
 import 'bulma/css/bulma.css'
+import '@fontsource/inter/index.css';
 
 import router from './router'
 

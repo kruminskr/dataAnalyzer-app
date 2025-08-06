@@ -5,7 +5,7 @@
         <div class="navbar-start">
           <a class="navbar-item" @click="newQuery()">
             <h1 class="title has-text-white is-5">
-              EU Data Insights
+              Data Insights
             </h1>
           </a>
         </div>
@@ -13,13 +13,16 @@
     </div>
   </nav>
 
-  <section class="hero is-dark is-fullheight-with-navbar">
+  <section class="hero is-dark is-fullheight-with-navbar main-content">
     <div class="hero-body">
       <!-- Input query -->
       <div v-if="!displayResults" class="container is-flex is-flex-direction-column is-align-items-center is-justify-content-center">
-        <h1 class="title has-text-centered">
+        <h1 class="title is-1 has-text-centered main-title">
           Europes data analysis tool
         </h1>
+        <subtitle class="subtitle has-text-centered mt-2">
+          Discover patterns and insights in European datasets
+        </subtitle>
 
         <div class="card input-card mt-2">
           <div class="card-content p-1">
@@ -39,7 +42,7 @@
 
         <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
           <h1 class="title mb-0">Analysis Results</h1>
-          <button class="button" @click="newQuery()">New Query</button>
+          <button class="button is-dark" @click="newQuery()">New Query</button>
         </div>
 
         <!-- text -->
@@ -77,6 +80,7 @@
           <p class="subtitle is-6" v-html="analysis.limitations"></p>
          </div>
       </div>
+
     </div>
   </section>
 </template>
@@ -154,5 +158,29 @@ const newQuery = () => {
   to {
     transform: rotate(360deg);
   }
+}
+
+.main-content {
+  background: linear-gradient(to right, #1a202c, #4a5568);
+  font-family: 'Inter', sans-serif;
+}
+
+.navbar {
+  background: linear-gradient(to right, #1a202c, #4a5568);
+  font-family: 'Inter', sans-serif;
+}
+
+/* .main-title {
+  font-size: 4rem;
+  font-weight: 800;
+}
+
+.subtitle {
+  font-size: 1.3rem;
+  font-weight: 400;
+} */
+
+.button {
+  background-color: #8b5cf6 ;
 }
 </style>
