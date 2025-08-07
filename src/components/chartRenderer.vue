@@ -27,8 +27,6 @@ const props = defineProps({
 const processedOptions = computed(() => {
   const options = props.chart.options || {};
 
-  console.log('Processed Options:');
-
   return {
     responsive: true,
     plugins: {

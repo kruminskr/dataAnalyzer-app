@@ -26,7 +26,10 @@
 
         <div class="card input-card mt-2">
           <div class="card-content p-1">
-            <textarea v-model="query" class="textarea is-shadowless no-border" placeholder="What do you want to know?" rows="3"></textarea>
+            <textarea v-if="!loading" v-model="query" class="textarea is-shadowless no-border" placeholder="What do you want to know?" rows="3"></textarea>
+
+            <p v-if="loading" class="loading-placeholder has-text-grey-light">{{ loadingMessage }}</p>
+
             <button class="button is-dark is-pulled-right my-2" @click="analyzeQuery" :disabled="loading">
               <span v-if="!loading">Analyze</span>
               <span v-else class="is-flex is-align-items-center">
@@ -88,8 +91,11 @@
 <script setup>
 import { ref, computed } from 'vue';
 import axios from 'axios';
+import { useToast } from "vue-toastification";
 
 import ChartRenderer from '../components/chartRenderer.vue';
+
+const toast = useToast()
 
 const backendAPI = import.meta.env.VITE_BACKEND_URL;
 
@@ -98,6 +104,37 @@ const displayResults = ref(false);
 const analysis = ref({});
 const charts = ref([]);
 const loading = ref(false);
+const loadingMessage = ref('');
+let loadingInterval = null;
+
+const loadingMessages = [
+  "Analyzing your question...",
+  "Fetching data from Eurostat...",
+  "Crunching numbers...",
+  "Generating insights...",
+  "Almost there..."
+];
+
+const startLoadingMessages = () => {
+  let step = 0;
+  loadingMessage.value = loadingMessages[step];
+
+  loadingInterval = setInterval(() => {
+    step++;
+
+    if (step >= loadingMessages.length) {
+      clearInterval(loadingInterval);
+      return;
+    }
+
+    loadingMessage.value = loadingMessages[step];
+  }, 4000);
+};
+
+const stopLoadingMessages = () => {
+  clearInterval(loadingInterval);
+  loadingMessage.value = '';
+};
 
 const formattedText = computed(() =>
   analysis.value.text.replace(/\n/g, '<br><br>')
@@ -105,24 +142,46 @@ const formattedText = computed(() =>
 
 const  analyzeQuery = async () => {
   try {
+    const trimmedQuery = query.value.trim();
+
+    if (!trimmedQuery) {
+      toast.warning("Please enter a question :)");
+      return;
+    }
+
     loading.value = true;
+    startLoadingMessages();
 
     const body = {
-      query: query.value,
+      query: trimmedQuery,
     } 
 
     const response = await axios.post(`${backendAPI}/api/v1/data`, body)
 
     loading.value = false;
+    stopLoadingMessages();
     displayResults.value = true;
     analysis.value = response.data.analysis;
     charts.value = response.data.charts;
 
     return;
   } catch (error) {
-    console.error(error)
-    loading.value = false;
-    return;
+    const message = error?.response?.data?.message || "";
+
+    if (message.includes("generativelanguage.googleapis.com")) {
+      toast.error("AI service failed to respond. Try a different query.");
+    }
+
+    if (message.includes("ec.europa.eu")) {
+      toast.error("Eurostat failed to respond. Try a different query.");
+    }
+
+    if (error.status === 500) {
+      toast.error("Internal server error. Please try again later.");
+    }
+
+    stopLoadingMessages();
+    return loading.value = false;
   }
 }
 
@@ -172,15 +231,20 @@ const newQuery = () => {
   font-family: 'Inter', sans-serif;
 }
 
-/* .main-title {
-  font-size: 4rem;
-  font-weight: 800;
+.loading-placeholder {
+  height: 6em; 
+  padding: 0.625em 0.75em;
+  border: none;
+  background-color: transparent;
+  font-size: 1rem;
+  line-height: 1.5;
+  max-height: 70px;
+  white-space: pre-wrap;
+  display: block;
+  color: #b5b5b5; 
+  border-radius: 4px;
+  background: #fff; 
 }
-
-.subtitle {
-  font-size: 1.3rem;
-  font-weight: 400;
-} */
 
 .button {
   background-color: #8b5cf6 ;
