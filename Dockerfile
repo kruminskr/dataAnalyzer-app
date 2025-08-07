@@ -1,4 +1,5 @@
-FROM node:20
+# Docker
+FROM node:20 AS builder
 
 WORKDIR /app
 
@@ -10,6 +11,13 @@ COPY . .
 
 RUN npm run build
 
-EXPOSE 4173
+# Nginx
+FROM nginx:alpine
+RUN rm -rf /usr/share/nginx/html/*
 
-CMD ["npm", "run", "preview"]
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
