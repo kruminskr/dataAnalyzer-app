@@ -91,6 +91,8 @@ import axios from 'axios';
 
 import ChartRenderer from '../components/chartRenderer.vue';
 
+const backendAPI = import.meta.env.VITE_BACKEND_URL;
+
 const query = ref('');
 const displayResults = ref(false);
 const analysis = ref({});
@@ -109,7 +111,7 @@ const  analyzeQuery = async () => {
       query: query.value,
     } 
 
-    const response = await axios.post('http://localhost:3000/api/v1/data', body)
+    const response = await axios.post(`${backendAPI}/api/v1/data`, body)
 
     loading.value = false;
     displayResults.value = true;
