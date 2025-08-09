@@ -156,7 +156,7 @@ const  analyzeQuery = async () => {
       query: trimmedQuery,
     } 
 
-    const response = await axios.post(`${backendAPI}/api/v1/data`, body)
+    const response = await axios.post(`${backendAPI}/v1/data`, body)
 
     loading.value = false;
     stopLoadingMessages();
@@ -164,7 +164,7 @@ const  analyzeQuery = async () => {
     analysis.value = response.data.analysis;
     charts.value = response.data.charts;
 
-    return;
+    return;  
   } catch (error) {
     const message = error?.response?.data?.message || "";
 
